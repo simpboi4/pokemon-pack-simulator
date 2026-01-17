@@ -6,42 +6,165 @@
 <title>Pokémon Pack Opening Simulator</title>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
-body { font-family: Arial, sans-serif; background: url("background.jpg") center/cover fixed; min-height: 100vh; display:flex; justify-content:center; align-items:center; overflow-x:hidden; }
+body { 
+    font-family: Arial, sans-serif; 
+    background: url("background.jpg") center/cover fixed; 
+    min-height: 100vh; 
+    display:flex; 
+    justify-content:center; 
+    align-items:center; 
+    overflow-x:hidden; 
+}
 
-.container { max-width: 1200px; width:100%; padding:20px; }
+.container { 
+    max-width: 1200px; 
+    width:100%; 
+    padding:16px; 
+}
+
 .hidden { display:none!important; }
 
-.box-screen, .packs-screen, .cards-screen { min-height:80vh; display:flex; justify-content:center; align-items:center; flex-wrap: wrap; }
-
-.box img { max-width:400px; cursor:pointer; transition:.3s; }
-.box img:hover { transform:scale(1.05); }
-
-.packs-screen { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:20px; }
-.pack img { width:100%; cursor:pointer; transition:.3s; }
-.pack:hover { transform:scale(1.05); }
-.pack.tearing { animation: tear .5s forwards; }
-@keyframes tear { 0%{opacity:1} 50%{transform:scale(1.1)} 100%{opacity:0;transform:scale(.7);} }
-
-.cards-screen { display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:15px; }
-.card { height:200px; cursor:pointer; perspective:1000px; }
-.card-inner { width:100%; height:100%; transition:.6s; transform-style: preserve-3d; }
-.card.flipped .card-inner { transform:rotateY(180deg); }
-.card-face { position:absolute; width:100%; height:100%; backface-visibility:hidden; border-radius:10px; box-shadow:0 5px 15px rgba(0,0,0,0.3); }
-.card-front { transform:rotateY(180deg); }
-.card-face img { width:100%; height:100%; object-fit:cover; }
-
-.back-button { position:fixed; top:20px; left:20px; padding:12px 25px; font-size:16px; border:none; border-radius:20px; cursor:pointer; background:white; z-index:1000; }
-.back-button:hover { transform: scale(1.05); }
-
-@media(max-width:768px){
-    .packs-screen { grid-template-columns:repeat(2,1fr); gap:15px; }
-    .cards-screen { grid-template-columns:repeat(2,1fr); gap:10px; }
-    .card { height:150px; }
-    .back-button { padding:10px 20px; font-size:14px; }
+/* ── BOX ── */
+.box-screen { 
+    min-height:80vh; 
+    display:flex; 
+    justify-content:center; 
+    align-items:center; 
 }
-@media(max-width:480px){
-    .packs-screen, .cards-screen { grid-template-columns:1fr; }
-    .card { height:120px; }
+.box img { 
+    max-width: min(85vw, 420px); 
+    cursor:pointer; 
+    transition: transform .25s; 
+}
+.box img:hover { transform:scale(1.06); }
+
+/* ── PACKS ── */
+.packs-screen { 
+    min-height:80vh; 
+    display:grid; 
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); 
+    gap: 16px; 
+    padding: 20px 0; 
+    align-content: center;
+}
+.pack img { 
+    width:100%; 
+    max-width: 180px; 
+    margin: 0 auto; 
+    display: block;
+    cursor:pointer; 
+    transition: transform .25s; 
+}
+.pack img:hover { transform:scale(1.07); }
+.pack.tearing { animation: tear .5s forwards; }
+
+@keyframes tear { 
+    0%   {opacity:1; transform:scale(1)} 
+    50%  {transform:scale(1.12)} 
+    100% {opacity:0; transform:scale(0.75);} 
+}
+
+/* ── CARDS ── */
+.cards-screen { 
+    min-height:80vh; 
+    display:grid; 
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); 
+    gap: 14px; 
+    padding: 20px 0; 
+    align-content: center;
+}
+
+.card { 
+    height: 0; 
+    padding-bottom: 140%;          /* ≈ card proportion 3.5:2.5 → 140% */
+    position: relative; 
+    cursor: pointer; 
+    perspective: 1000px; 
+}
+
+.card-inner { 
+    position: absolute; 
+    inset: 0; 
+    transition: transform .6s; 
+    transform-style: preserve-3d; 
+}
+
+.card.flipped .card-inner { 
+    transform: rotateY(180deg); 
+}
+
+.card-face { 
+    position: absolute; 
+    inset: 0; 
+    backface-visibility: hidden; 
+    border-radius: 10px; 
+    box-shadow: 0 4px 14px rgba(0,0,0,0.35); 
+    overflow: hidden; 
+}
+
+.card-front { 
+    transform: rotateY(180deg); 
+}
+
+.card-face img { 
+    width: 100%; 
+    height: 100%; 
+    object-fit: cover; 
+}
+
+/* ── BACK BUTTON ── */
+.back-button { 
+    position: fixed; 
+    top: 12px; 
+    left: 12px; 
+    padding: 10px 18px; 
+    font-size: 15px; 
+    border: none; 
+    border-radius: 999px; 
+    cursor: pointer; 
+    background: rgba(255,255,255,0.92); 
+    backdrop-filter: blur(6px); 
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2); 
+    z-index: 1000; 
+    transition: transform .2s;
+}
+
+.back-button:hover { transform: scale(1.06); }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+    .packs-screen { 
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); 
+        gap: 14px; 
+    }
+    .pack img { max-width: 160px; }
+    
+    .cards-screen { 
+        grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); 
+        gap: 12px; 
+    }
+    
+    .back-button { 
+        padding: 8px 16px; 
+        font-size: 13px; 
+        top: 10px; 
+        left: 10px; 
+    }
+}
+
+@media (max-width: 480px) {
+    .packs-screen { 
+        grid-template-columns: repeat(2, 1fr); 
+        gap: 12px; 
+    }
+    .pack img { max-width: 100%; }
+    
+    .cards-screen { 
+        grid-template-columns: repeat(2, 1fr); 
+        gap: 10px; 
+    }
+    
+    .container { padding: 12px; }
 }
 </style>
 </head>
@@ -50,7 +173,6 @@ body { font-family: Arial, sans-serif; background: url("background.jpg") center/
 <button class="back-button hidden" id="backBtn">← Back</button>
 
 <div class="container">
-
     <!-- BOX -->
     <div class="box-screen" id="boxScreen">
         <div class="box"><img src="box.png" alt="Box"></div>
@@ -68,7 +190,6 @@ body { font-family: Arial, sans-serif; background: url("background.jpg") center/
 
     <!-- CARDS -->
     <div class="cards-screen hidden" id="cardsScreen"></div>
-
 </div>
 
 <script>
@@ -77,6 +198,7 @@ const boxScreen = document.getElementById("boxScreen");
 const packsScreen = document.getElementById("packsScreen");
 const cardsScreen = document.getElementById("cardsScreen");
 const backBtn = document.getElementById("backBtn");
+
 let screen = "box";
 let cardImages = [];
 
@@ -84,7 +206,10 @@ let cardImages = [];
 const bgMusic = new Audio("bgsong.mp3"); bgMusic.loop = true;
 const packTearSound = new Audio("packtear.mp3");
 const paperSound = new Audio("paper.mp3");
-document.body.addEventListener("click", ()=>{ bgMusic.play().catch(e=>console.log("Music failed:",e)); }, {once:true});
+
+document.body.addEventListener("click", () => {
+    bgMusic.play().catch(e=>console.log("Music failed:",e));
+}, {once:true});
 
 // ---------------- LOAD CARDS FROM API ----------------
 async function loadCards(){
@@ -93,9 +218,13 @@ async function loadCards(){
             headers: { "X-Api-Key": "6ee0246b-91e6-453e-bb18-bf54f39b3d43" }
         });
         const data = await res.json();
-        cardImages = data.data.filter(c=>c.images && c.images.large).map(c=>c.images.large);
+        cardImages = data.data
+            .filter(c=>c.images && c.images.large)
+            .map(c=>c.images.large);
         console.log("Loaded cards:", cardImages.length);
-    }catch(e){ console.error("Failed to fetch cards:", e);}
+    }catch(e){ 
+        console.error("Failed to fetch cards:", e);
+    }
 }
 loadCards();
 
@@ -111,10 +240,12 @@ document.querySelector(".box").onclick = ()=>{
 document.querySelectorAll(".pack").forEach(pack=>{
     pack.onclick = ()=>{
         if(pack.classList.contains("tearing")) return;
+        
         packTearSound.currentTime=0;
         packTearSound.play().catch(e=>console.log("Pack sound failed",e));
+        
         pack.classList.add("tearing");
-
+        
         setTimeout(()=>{
             packsScreen.classList.add("hidden");
             cardsScreen.classList.remove("hidden");
@@ -124,35 +255,43 @@ document.querySelectorAll(".pack").forEach(pack=>{
     };
 });
 
-// ---------------- SHOW 11 BACKS ----------------
+// ---------------- SHOW 11 CARD BACKS ----------------
 function showBacks(){
     cardsScreen.innerHTML="";
-    // Clone cardImages to keep unique selection later
     let available = [...cardImages];
+
     for(let i=0;i<11;i++){
         const div = document.createElement("div");
         div.className="card";
         div.dataset.flipped="false";
-        div.dataset.index=i; // optional
+
         div.innerHTML=`
             <div class="card-inner">
-                <div class="card-face card-back"><img src="back.png" alt="Card Back"></div>
-                <div class="card-face card-front"><img src="" alt="Pokémon Card"></div>
+                <div class="card-face card-back">
+                    <img src="back.png" alt="Card Back">
+                </div>
+                <div class="card-face card-front">
+                    <img src="" alt="Pokémon Card">
+                </div>
             </div>
         `;
+
         div.onclick = ()=>{
             if(div.dataset.flipped==="false" && available.length>0){
-                // Pick a random unique card
                 const index = Math.floor(Math.random()*available.length);
                 const cardUrl = available.splice(index,1)[0];
+                
                 const frontImg = div.querySelector(".card-front img");
                 frontImg.src = cardUrl;
+                
                 paperSound.currentTime=0;
                 paperSound.play().catch(e=>console.log("Paper sound failed",e));
+                
                 div.classList.add("flipped");
                 div.dataset.flipped="true";
             }
         };
+
         cardsScreen.appendChild(div);
     }
 }
@@ -163,15 +302,16 @@ backBtn.onclick = ()=>{
         cardsScreen.classList.add("hidden");
         packsScreen.classList.remove("hidden");
         screen="packs";
-    } else if(screen==="packs"){
+    } 
+    else if(screen==="packs"){
         packsScreen.classList.add("hidden");
         boxScreen.classList.remove("hidden");
         backBtn.classList.add("hidden");
         screen="box";
     }
+    
     document.querySelectorAll(".pack").forEach(p=>p.classList.remove("tearing"));
 };
 </script>
-
 </body>
 </html>
