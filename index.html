@@ -3,167 +3,267 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Pokémon Pack Opening Simulator</title>
+<title>White Flare Pack Opening Simulator</title>
 <style>
-* { margin:0; padding:0; box-sizing:border-box; }
-body { font-family: Arial, sans-serif; background: url("background.jpg") center/cover fixed; min-height:100vh; display:flex; justify-content:center; align-items:center; overflow-x:hidden; }
-.container { max-width:1200px; width:100%; padding:20px; }
-.hidden { display:none!important; }
-.box-screen, .packs-screen, .cards-screen { min-height:80vh; display:flex; justify-content:center; align-items:center; flex-wrap: wrap; }
-.box img { max-width:400px; cursor:pointer; transition:.3s; }
-.box img:hover { transform:scale(1.05); }
-.packs-screen { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:20px; }
-.pack img { width:100%; cursor:pointer; transition:.3s; }
-.pack:hover { transform:scale(1.05); }
-.pack.tearing { animation: tear .5s forwards; }
-@keyframes tear { 0% { opacity:1; } 50% { transform:scale(1.1); } 100% { opacity:0; transform:scale(.7); } }
-.cards-screen { display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:15px; }
-.card { height:200px; cursor:pointer; perspective:1000px; }
-.card-inner { width:100%; height:100%; transition:.6s; transform-style: preserve-3d; }
-.card.flipped .card-inner { transform:rotateY(180deg); }
-.card-face { position:absolute; width:100%; height:100%; backface-visibility:hidden; border-radius:10px; box-shadow:0 5px 15px rgba(0,0,0,0.3); }
-.card-front { transform:rotateY(180deg); }
-.card-face img { width:100%; height:100%; object-fit:cover; }
-.back-button { position:fixed; top:20px; left:20px; padding:12px 25px; font-size:16px; border:none; border-radius:20px; cursor:pointer; background:white; z-index:1000; }
-.back-button:hover { transform:scale(1.05); }
-@media(max-width:768px){
-    .packs-screen { grid-template-columns:repeat(2,1fr); gap:15px; }
-    .cards-screen { grid-template-columns:repeat(2,1fr); gap:10px; }
-    .card { height:150px; }
-    .back-button { padding:10px 20px; font-size:14px; }
-}
-@media(max-width:480px){
-    .packs-screen, .cards-screen { grid-template-columns:1fr; }
-    .card { height:120px; }
-}
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: Arial, sans-serif;
+    background: #0a1421 url('https://images.alexonsager.net/pokemon/bg/bg_25.jpg') center/cover fixed;
+    color: #e0e0ff;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .container { max-width: 1200px; width: 100%; padding: 20px; text-align: center; }
+  .hidden { display: none !important; }
+
+  .screen { min-height: 80vh; display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 25px; }
+
+  .box img, .pack img {
+    max-width: 340px;
+    cursor: pointer;
+    transition: all 0.3s;
+    border-radius: 14px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+  }
+
+  .box img:hover, .pack img:hover { transform: scale(1.1); }
+
+  .packs-screen {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 30px;
+  }
+
+  .cards-screen {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 20px;
+    padding: 30px 10px;
+  }
+
+  .card {
+    height: 220px;
+    perspective: 1200px;
+    cursor: pointer;
+  }
+
+  .card-inner {
+    width: 100%;
+    height: 100%;
+    transition: transform 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    transform-style: preserve-3d;
+    position: relative;
+  }
+
+  .card.flipped .card-inner { transform: rotateY(180deg); }
+
+  .card-face {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    backface-visibility: hidden;
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.6);
+  }
+
+  .card-back {
+    background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .card-back img {
+    width: 80%;
+    opacity: 0.9;
+  }
+
+  .card-front { transform: rotateY(180deg); }
+
+  .card-face img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  h1 { margin-bottom: 20px; text-shadow: 0 0 15px #60a5fa; }
+
+  .back-button {
+    position: fixed;
+    top: 15px;
+    left: 15px;
+    padding: 12px 24px;
+    font-size: 17px;
+    background: rgba(255,255,255,0.95);
+    color: #1e40af;
+    border: none;
+    border-radius: 999px;
+    cursor: pointer;
+    z-index: 1000;
+    font-weight: bold;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+  }
+
+  @media (max-width: 768px) {
+    .cards-screen { grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); }
+    .card { height: 190px; }
+    .pack img { max-width: 260px; }
+  }
+
+  @media (max-width: 500px) {
+    .packs-screen { grid-template-columns: repeat(2, 1fr); }
+    .card { height: 160px; }
+  }
 </style>
 </head>
 <body>
-<!-- Background Music and Sounds -->
-<audio id="bgMusic" src="bgsong.mp3" loop></audio>
-<audio id="packTearSound" src="packtear.mp3"></audio>
-<audio id="paperSound" src="paper.mp3"></audio>
+
 <button class="back-button hidden" id="backBtn">← Back</button>
+
 <div class="container">
-    <!-- BOX -->
-    <div class="box-screen" id="boxScreen">
-        <div class="box"><img src="box.png" alt="Box"></div>
+
+  <h1 class="hidden" id="title">White Flare Pack Opening</h1>
+
+  <!-- BOX SCREEN -->
+  <div class="screen" id="boxScreen">
+    <div class="box">
+      <img src="https://images.pokemontcg.io/sv10.5/BoosterBox.png" alt="White Flare Box" onerror="this.src='https://via.placeholder.com/340x480/1e40af/ffffff?text=White+Flare+Box';">
     </div>
-    <!-- PACKS -->
-    <div class="packs-screen hidden" id="packsScreen">
-        <div class="pack"><img src="pack.png" alt="Pack"></div>
-        <div class="pack"><img src="pack.png" alt="Pack"></div>
-        <div class="pack"><img src="pack.png" alt="Pack"></div>
-        <div class="pack"><img src="pack.png" alt="Pack"></div>
-        <div class="pack"><img src="pack.png" alt="Pack"></div>
-        <div class="pack"><img src="pack.png" alt="Pack"></div>
-    </div>
-    <!-- CARDS -->
-    <div class="cards-screen hidden" id="cardsScreen"></div>
+  </div>
+
+  <!-- PACKS SCREEN -->
+  <div class="screen packs-screen hidden" id="packsScreen">
+    <div class="pack"><img src="https://images.pokemontcg.io/sv10.5/BoosterPack.png" alt="Pack" onerror="this.src='https://via.placeholder.com/200x280/3b82f6/ffffff?text=Pack';"></div>
+    <div class="pack"><img src="https://images.pokemontcg.io/sv10.5/BoosterPack.png" alt="Pack" onerror="this.src='https://via.placeholder.com/200x280/3b82f6/ffffff?text=Pack';"></div>
+    <div class="pack"><img src="https://images.pokemontcg.io/sv10.5/BoosterPack.png" alt="Pack" onerror="this.src='https://via.placeholder.com/200x280/3b82f6/ffffff?text=Pack';"></div>
+    <div class="pack"><img src="https://images.pokemontcg.io/sv10.5/BoosterPack.png" alt="Pack" onerror="this.src='https://via.placeholder.com/200x280/3b82f6/ffffff?text=Pack';"></div>
+    <div class="pack"><img src="https://images.pokemontcg.io/sv10.5/BoosterPack.png" alt="Pack" onerror="this.src='https://via.placeholder.com/200x280/3b82f6/ffffff?text=Pack';"></div>
+    <div class="pack"><img src="https://images.pokemontcg.io/sv10.5/BoosterPack.png" alt="Pack" onerror="this.src='https://via.placeholder.com/200x280/3b82f6/ffffff?text=Pack';"></div>
+  </div>
+
+  <!-- CARDS SCREEN -->
+  <div class="screen cards-screen hidden" id="cardsScreen"></div>
+
 </div>
+
 <script>
-// ---------------- STATE ----------------
-const boxScreen = document.getElementById("boxScreen");
+// ─────────────────────────────────────────────────────────────
+const boxScreen   = document.getElementById("boxScreen");
 const packsScreen = document.getElementById("packsScreen");
 const cardsScreen = document.getElementById("cardsScreen");
-const backBtn = document.getElementById("backBtn");
-let screen = "box";
-let cardImages = []; // All API cards
-let currentPackCards = []; // 9 unique cards for this pack
-// ---------------- AUDIO ----------------
-const bgMusic = document.getElementById("bgMusic");
-const packTearSound = document.getElementById("packTearSound");
-const paperSound = document.getElementById("paperSound");
-// iOS/Android require user gesture to play audio
-document.body.addEventListener("click", () => {
-    bgMusic.play().catch(e=>console.log("Music play failed", e));
-}, { once:true });
-// ---------------- LOAD CARDS ----------------
-async function loadCards(){
-    try{
-        const res = await fetch("https://api.pokemontcg.io/v2/cards?q=set.id:sv03 types:Fire&pageSize=250", {
-            headers: { "X-Api-Key": "6ee0246b-91e6-453e-bb18-bf54f39b3d43" }
-        });
-        const data = await res.json();
-        cardImages = data.data.filter(c=>c.images && c.images.large).map(c=>c.images.large);
-        console.log("Loaded cards:", cardImages.length);
-    }catch(e){ console.error("Failed to fetch cards:", e);}
+const backBtn     = document.getElementById("backBtn");
+const title       = document.getElementById("title");
+
+let screenState = "box";
+let allCards = [];
+let currentPack = [];
+
+// White Flare set id = sv10.5 (Scarlet & Violet 10.5 — White Flare)
+const SET_ID = "sv10.5";
+
+async function loadCards() {
+  try {
+    const url = `https://api.pokemontcg.io/v2/cards?q=set.id:${SET_ID}&pageSize=350`;
+    const response = await fetch(url);
+    const data = await response.json();
+    
+    allCards = data.data
+      .filter(card => card.images?.large)
+      .map(card => card.images.large);
+    
+    console.log(`Loaded ${allCards.length} cards from White Flare`);
+    
+    if (allCards.length > 0) {
+      title.classList.remove("hidden");
+    }
+  } catch (err) {
+    console.error("Failed to load White Flare cards:", err);
+    alert("Could not load White Flare cards from the Pokémon TCG API.\n\nTry again later or check your internet connection.");
+  }
 }
+
 loadCards();
-// ---------------- BOX CLICK ----------------
-document.querySelector(".box").onclick = () => {
+
+// ─── Click box → show packs ───
+document.querySelectorAll(".box img").forEach(img => {
+  img.addEventListener("click", () => {
     boxScreen.classList.add("hidden");
     packsScreen.classList.remove("hidden");
     backBtn.classList.remove("hidden");
-    screen = "packs";
-};
-// ---------------- PACK CLICK ----------------
-document.querySelectorAll(".pack").forEach(pack => {
-    pack.onclick = () => {
-        if(pack.classList.contains("tearing")) return;
-        packTearSound.currentTime = 0;
-        packTearSound.play().catch(e=>console.log("Pack sound failed", e));
-        pack.classList.add("tearing");
-        setTimeout(() => {
-            packsScreen.classList.add("hidden");
-            cardsScreen.classList.remove("hidden");
-            generatePackCards();
-            showBacks();
-            screen = "cards";
-        }, 500);
-    };
+    screenState = "packs";
+  });
 });
-// ---------------- GENERATE 9 UNIQUE CARDS ----------------
-function generatePackCards(){
-    currentPackCards = [];
-    if(cardImages.length===0) return;
-    let copy = [...cardImages];
-    for(let i=0; i<9; i++){
-        if(copy.length===0) break;
-        const idx = Math.floor(Math.random()*copy.length);
-        currentPackCards.push(copy.splice(idx,1)[0]);
-    }
+
+// ─── Click any pack → open & show 9 card backs ───
+document.querySelectorAll(".pack img").forEach(pack => {
+  pack.addEventListener("click", () => {
+    pack.style.transform = "scale(1.2) rotate(8deg)";
+    setTimeout(() => {
+      packsScreen.classList.add("hidden");
+      cardsScreen.classList.remove("hidden");
+      generateAndShowPack();
+      screenState = "cards";
+    }, 450);
+  });
+});
+
+function generateAndShowPack() {
+  currentPack = [];
+  cardsScreen.innerHTML = "";
+
+  if (allCards.length < 9) {
+    alert(`Not enough cards loaded! Only ${allCards.length} available.`);
+    return;
+  }
+
+  // Get 9 unique random cards
+  const shuffled = [...allCards].sort(() => Math.random() - 0.5);
+  currentPack = shuffled.slice(0, 9);
+
+  currentPack.forEach((cardUrl, i) => {
+    const cardDiv = document.createElement("div");
+    cardDiv.className = "card";
+    cardDiv.dataset.index = i;
+
+    cardDiv.innerHTML = `
+      <div class="card-inner">
+        <div class="card-face card-back">
+          <img src="https://images.pokemontcg.io/back.png" alt="Back">
+        </div>
+        <div class="card-face card-front">
+          <img src="" alt="White Flare Card">
+        </div>
+      </div>
+    `;
+
+    cardDiv.addEventListener("click", function() {
+      if (this.classList.contains("flipped")) return;
+      
+      const front = this.querySelector(".card-front img");
+      front.src = currentPack[this.dataset.index];
+      this.classList.add("flipped");
+    });
+
+    cardsScreen.appendChild(cardDiv);
+  });
 }
-// ---------------- SHOW CARD BACKS ----------------
-function showBacks(){
-    cardsScreen.innerHTML = "";
-    for(let i=0; i<currentPackCards.length; i++){
-        const div = document.createElement("div");
-        div.className = "card";
-        div.dataset.flipped = "false";
-        div.innerHTML = `
-            <div class="card-inner">
-                <div class="card-face card-back"><img src="back.png" alt="Card Back"></div>
-                <div class="card-face card-front"><img src="" alt="Pokémon Card"></div>
-            </div>
-        `;
-        div.onclick = () => {
-            if(div.dataset.flipped === "false"){
-                const frontImg = div.querySelector(".card-front img");
-                frontImg.src = currentPackCards[i];
-                paperSound.currentTime = 0;
-                paperSound.play().catch(e=>console.log("Paper sound failed", e));
-                div.classList.add("flipped");
-                div.dataset.flipped = "true";
-            }
-        };
-        cardsScreen.appendChild(div);
-    }
-}
-// ---------------- BACK BUTTON ----------------
-backBtn.onclick = () => {
-    if(screen === "cards"){
-        cardsScreen.classList.add("hidden");
-        packsScreen.classList.remove("hidden");
-        screen = "packs";
-    } else if(screen === "packs"){
-        packsScreen.classList.add("hidden");
-        boxScreen.classList.remove("hidden");
-        backBtn.classList.add("hidden");
-        screen = "box";
-    }
-    document.querySelectorAll(".pack").forEach(p=>p.classList.remove("tearing"));
-};
+
+// ─── Back navigation ───
+backBtn.addEventListener("click", () => {
+  if (screenState === "cards") {
+    cardsScreen.classList.add("hidden");
+    packsScreen.classList.remove("hidden");
+    screenState = "packs";
+  } else if (screenState === "packs") {
+    packsScreen.classList.add("hidden");
+    boxScreen.classList.remove("hidden");
+    backBtn.classList.add("hidden");
+    screenState = "box";
+  }
+});
 </script>
 </body>
 </html>
