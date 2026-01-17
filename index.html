@@ -7,21 +7,16 @@
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
 body { font-family: Arial, sans-serif; background: url("background.jpg") center/cover fixed; min-height:100vh; display:flex; justify-content:center; align-items:center; overflow-x:hidden; }
-
 .container { max-width:1200px; width:100%; padding:20px; }
 .hidden { display:none!important; }
-
 .box-screen, .packs-screen, .cards-screen { min-height:80vh; display:flex; justify-content:center; align-items:center; flex-wrap: wrap; }
-
 .box img { max-width:400px; cursor:pointer; transition:.3s; }
 .box img:hover { transform:scale(1.05); }
-
 .packs-screen { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:20px; }
 .pack img { width:100%; cursor:pointer; transition:.3s; }
 .pack:hover { transform:scale(1.05); }
 .pack.tearing { animation: tear .5s forwards; }
 @keyframes tear { 0% { opacity:1; } 50% { transform:scale(1.1); } 100% { opacity:0; transform:scale(.7); } }
-
 .cards-screen { display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:15px; }
 .card { height:200px; cursor:pointer; perspective:1000px; }
 .card-inner { width:100%; height:100%; transition:.6s; transform-style: preserve-3d; }
@@ -29,10 +24,8 @@ body { font-family: Arial, sans-serif; background: url("background.jpg") center/
 .card-face { position:absolute; width:100%; height:100%; backface-visibility:hidden; border-radius:10px; box-shadow:0 5px 15px rgba(0,0,0,0.3); }
 .card-front { transform:rotateY(180deg); }
 .card-face img { width:100%; height:100%; object-fit:cover; }
-
 .back-button { position:fixed; top:20px; left:20px; padding:12px 25px; font-size:16px; border:none; border-radius:20px; cursor:pointer; background:white; z-index:1000; }
 .back-button:hover { transform:scale(1.05); }
-
 @media(max-width:768px){
     .packs-screen { grid-template-columns:repeat(2,1fr); gap:15px; }
     .cards-screen { grid-template-columns:repeat(2,1fr); gap:10px; }
@@ -46,21 +39,16 @@ body { font-family: Arial, sans-serif; background: url("background.jpg") center/
 </style>
 </head>
 <body>
-
 <!-- Background Music and Sounds -->
 <audio id="bgMusic" src="bgsong.mp3" loop></audio>
 <audio id="packTearSound" src="packtear.mp3"></audio>
 <audio id="paperSound" src="paper.mp3"></audio>
-
 <button class="back-button hidden" id="backBtn">← Back</button>
-
 <div class="container">
-
     <!-- BOX -->
     <div class="box-screen" id="boxScreen">
         <div class="box"><img src="box.png" alt="Box"></div>
     </div>
-
     <!-- PACKS -->
     <div class="packs-screen hidden" id="packsScreen">
         <div class="pack"><img src="pack.png" alt="Pack"></div>
@@ -70,33 +58,26 @@ body { font-family: Arial, sans-serif; background: url("background.jpg") center/
         <div class="pack"><img src="pack.png" alt="Pack"></div>
         <div class="pack"><img src="pack.png" alt="Pack"></div>
     </div>
-
     <!-- CARDS -->
     <div class="cards-screen hidden" id="cardsScreen"></div>
-
 </div>
-
 <script>
 // ---------------- STATE ----------------
 const boxScreen = document.getElementById("boxScreen");
 const packsScreen = document.getElementById("packsScreen");
 const cardsScreen = document.getElementById("cardsScreen");
 const backBtn = document.getElementById("backBtn");
-
 let screen = "box";
-let cardImages = [];        // All API cards
-let currentPackCards = [];  // 11 unique cards for this pack
-
+let cardImages = []; // All API cards
+let currentPackCards = []; // 9 unique cards for this pack
 // ---------------- AUDIO ----------------
 const bgMusic = document.getElementById("bgMusic");
 const packTearSound = document.getElementById("packTearSound");
 const paperSound = document.getElementById("paperSound");
-
 // iOS/Android require user gesture to play audio
 document.body.addEventListener("click", () => {
     bgMusic.play().catch(e=>console.log("Music play failed", e));
 }, { once:true });
-
 // ---------------- LOAD CARDS ----------------
 async function loadCards(){
     try{
@@ -109,7 +90,6 @@ async function loadCards(){
     }catch(e){ console.error("Failed to fetch cards:", e);}
 }
 loadCards();
-
 // ---------------- BOX CLICK ----------------
 document.querySelector(".box").onclick = () => {
     boxScreen.classList.add("hidden");
@@ -117,16 +97,13 @@ document.querySelector(".box").onclick = () => {
     backBtn.classList.remove("hidden");
     screen = "packs";
 };
-
 // ---------------- PACK CLICK ----------------
 document.querySelectorAll(".pack").forEach(pack => {
     pack.onclick = () => {
         if(pack.classList.contains("tearing")) return;
-
         packTearSound.currentTime = 0;
         packTearSound.play().catch(e=>console.log("Pack sound failed", e));
         pack.classList.add("tearing");
-
         setTimeout(() => {
             packsScreen.classList.add("hidden");
             cardsScreen.classList.remove("hidden");
@@ -136,20 +113,17 @@ document.querySelectorAll(".pack").forEach(pack => {
         }, 500);
     };
 });
-
-// ---------------- GENERATE 11 UNIQUE CARDS ----------------
+// ---------------- GENERATE 9 UNIQUE CARDS ----------------
 function generatePackCards(){
     currentPackCards = [];
     if(cardImages.length===0) return;
-
     let copy = [...cardImages];
-    for(let i=0; i<11; i++){
+    for(let i=0; i<9; i++){
         if(copy.length===0) break;
         const idx = Math.floor(Math.random()*copy.length);
         currentPackCards.push(copy.splice(idx,1)[0]);
     }
 }
-
 // ---------------- SHOW CARD BACKS ----------------
 function showBacks(){
     cardsScreen.innerHTML = "";
@@ -157,14 +131,12 @@ function showBacks(){
         const div = document.createElement("div");
         div.className = "card";
         div.dataset.flipped = "false";
-
         div.innerHTML = `
             <div class="card-inner">
                 <div class="card-face card-back"><img src="back.png" alt="Card Back"></div>
                 <div class="card-face card-front"><img src="" alt="Pokémon Card"></div>
             </div>
         `;
-
         div.onclick = () => {
             if(div.dataset.flipped === "false"){
                 const frontImg = div.querySelector(".card-front img");
@@ -175,11 +147,9 @@ function showBacks(){
                 div.dataset.flipped = "true";
             }
         };
-
         cardsScreen.appendChild(div);
     }
 }
-
 // ---------------- BACK BUTTON ----------------
 backBtn.onclick = () => {
     if(screen === "cards"){
@@ -195,6 +165,5 @@ backBtn.onclick = () => {
     document.querySelectorAll(".pack").forEach(p=>p.classList.remove("tearing"));
 };
 </script>
-
 </body>
 </html>
