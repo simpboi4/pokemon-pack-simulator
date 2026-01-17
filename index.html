@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pokémon Pack Opening Simulator</title>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family: Arial, sans-serif; background: url("background.jpg") center/cover fixed; min-height: 100vh; display:flex; justify-content:center; align-items:center; overflow-x:hidden; }
+
+.container { max-width: 1200px; width:100%; padding:20px; }
+.hidden { display:none!important; }
+
+.box-screen, .packs-screen, .cards-screen { min-height:80vh; display:flex; justify-content:center; align-items:center; flex-wrap: wrap; }
+
+.box img { max-width:400px; cursor:pointer; transition:.3s; }
+.box img:hover { transform:scale(1.05); }
+
+.packs-screen { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:20px; }
+.pack img { width:100%; cursor:pointer; transition:.3s; }
+.pack:hover { transform:scale(1.05); }
+.pack.tearing { animation: tear .5s forwards; }
+@keyframes tear { 0%{opacity:1} 50%{transform:scale(1.1)} 100%{opacity:0;transform:scale(.7);} }
+
+.cards-screen { display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:15px; }
+.card { height:200px; cursor:pointer; perspective:1000px; }
+.card-inner { width:100%; height:100%; transition:.6s; transform-style: preserve-3d; }
+.card.flipped .card-inner { transform:rotateY(180deg); }
+.card-face { position:absolute; width:100%; height:100%; backface-visibility:hidden; border-radius:10px; box-shadow:0 5px 15px rgba(0,0,0,0.3); }
+.card-front { transform:rotateY(180deg); }
+.card-face img { width:100%; height:100%; object-fit:cover; }
+
+.back-button { position:fixed; top:20px; left:20px; padding:12px 25px; font-size:16px; border:none; border-radius:20px; cursor:pointer; background:white; z-index:1000; }
+.back-button:hover { transform: scale(1.05); }
+
+@media(max-width:768px){
+    .packs-screen { grid-template-columns:repeat(2,1fr); gap:15px; }
+    .cards-screen { grid-template-columns:repeat(2,1fr); gap:10px; }
+    .card { height:150px; }
+    .back-button { padding:10px 20px; font-size:14px; }
+}
+@media(max-width:480px){
+    .packs-screen, .cards-screen { grid-template-columns:1fr; }
+    .card { height:120px; }
+}
+</style>
+</head>
+<body>
+
+<button class="back-button hidden" id="backBtn">← Back</button>
+
+<div class="container">
+
+    <!-- BOX -->
+    <div class="box-screen" id="boxScreen">
+        <div class="box"><img src="box.png" alt="Box"></div>
+    </div>
+
+    <!-- PACKS -->
+    <div class="packs-screen hidden" id="packsScreen">
+        <div class="pack"><img src="pack.png" alt="Pack"></div>
+        <div class="pack"><img src="pack.png" alt="Pack"></div>
+        <div class="pack"><img src="pack.png" alt="Pack"></div>
+        <div class="pack"><img src="pack.png" alt="Pack"></div>
+        <div class="pack"><img src="pack.png" alt="Pack"></div>
+        <div class="pack"><img src="pack.png" alt="Pack"></div>
+    </div>
+
+    <!-- CARDS -->
+    <div class="cards-screen hidden" id="cardsScreen"></div>
+
+</div>
+
+<script>
+// ---------------- STATE ----------------
+const boxScreen = document.getElementById("boxScreen");
+const packsScreen = document.getElementById("packsScreen");
+const cardsScreen = document.getElementById("cardsScreen");
+const backBtn = document.getElementById("backBtn");
+let screen = "box";
+let cardImages = [];
+
+// ---------------- AUDIO ----------------
+const bgMusic = new Audio("bgsong.mp3"); bgMusic.loop = true;
+const packTearSound = new Audio("packtear.mp3");
+const paperSound = new Audio("paper.mp3");
+document.body.addEventListener("click", ()=>{ bgMusic.play().catch(e=>console.log("Music failed:",e)); }, {once:true});
+
+// ---------------- LOAD CARDS FROM API ----------------
+async function loadCards(){
+    try{
+        const res = await fetch("https://api.pokemontcg.io/v2/cards?q=set.id:sv03 types:Fire&pageSize=250", {
+            headers: { "X-Api-Key": "6ee0246b-91e6-453e-bb18-bf54f39b3d43" }
+        });
+        const data = await res.json();
+        cardImages = data.data.filter(c=>c.images && c.images.large).map(c=>c.images.large);
+        console.log("Loaded cards:", cardImages.length);
+    }catch(e){ console.error("Failed to fetch cards:", e);}
+}
+loadCards();
+
+// ---------------- BOX CLICK ----------------
+document.querySelector(".box").onclick = ()=>{
+    boxScreen.classList.add("hidden");
+    packsScreen.classList.remove("hidden");
+    backBtn.classList.remove("hidden");
+    screen="packs";
+};
+
+// ---------------- PACK CLICK ----------------
+document.querySelectorAll(".pack").forEach(pack=>{
+    pack.onclick = ()=>{
+        if(pack.classList.contains("tearing")) return;
+        packTearSound.currentTime=0;
+        packTearSound.play().catch(e=>console.log("Pack sound failed",e));
+        pack.classList.add("tearing");
+
+        setTimeout(()=>{
+            packsScreen.classList.add("hidden");
+            cardsScreen.classList.remove("hidden");
+            showBacks();
+            screen="cards";
+        },500);
+    };
+});
+
+// ---------------- SHOW 11 BACKS ----------------
+function showBacks(){
+    cardsScreen.innerHTML="";
+    // Clone cardImages to keep unique selection later
+    let available = [...cardImages];
+    for(let i=0;i<11;i++){
+        const div = document.createElement("div");
+        div.className="card";
+        div.dataset.flipped="false";
+        div.dataset.index=i; // optional
+        div.innerHTML=`
+            <div class="card-inner">
+                <div class="card-face card-back"><img src="back.png" alt="Card Back"></div>
+                <div class="card-face card-front"><img src="" alt="Pokémon Card"></div>
+            </div>
+        `;
+        div.onclick = ()=>{
+            if(div.dataset.flipped==="false" && available.length>0){
+                // Pick a random unique card
+                const index = Math.floor(Math.random()*available.length);
+                const cardUrl = available.splice(index,1)[0];
+                const frontImg = div.querySelector(".card-front img");
+                frontImg.src = cardUrl;
+                paperSound.currentTime=0;
+                paperSound.play().catch(e=>console.log("Paper sound failed",e));
+                div.classList.add("flipped");
+                div.dataset.flipped="true";
+            }
+        };
+        cardsScreen.appendChild(div);
+    }
+}
+
+// ---------------- BACK BUTTON ----------------
+backBtn.onclick = ()=>{
+    if(screen==="cards"){
+        cardsScreen.classList.add("hidden");
+        packsScreen.classList.remove("hidden");
+        screen="packs";
+    } else if(screen==="packs"){
+        packsScreen.classList.add("hidden");
+        boxScreen.classList.remove("hidden");
+        backBtn.classList.add("hidden");
+        screen="box";
+    }
+    document.querySelectorAll(".pack").forEach(p=>p.classList.remove("tearing"));
+};
+</script>
+
+</body>
+</html>
