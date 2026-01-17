@@ -7,89 +7,29 @@
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
-body{
-    font-family:Arial,sans-serif;
-    background:url("background.jpg") center/cover fixed;
-    min-height:100vh;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-}
+body{font-family:Arial,sans-serif;background:url("background.jpg") center/cover fixed;min-height:100vh;display:flex;justify-content:center;align-items:center;}
 .container{max-width:1200px;width:100%;padding:20px;}
 .hidden{display:none!important;}
 
-.box-screen,.packs-screen,.cards-screen{
-    min-height:80vh;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-}
-
-.box img{
-    max-width:400px;
-    cursor:pointer;
-    transition:.3s;
-}
+.box-screen,.packs-screen,.cards-screen{min-height:80vh;display:flex;justify-content:center;align-items:center;}
+.box img{max-width:400px;cursor:pointer;transition:.3s;}
 .box img:hover{transform:scale(1.05);}
 
-.packs-screen{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
-    gap:30px;
-}
-
-.pack img{
-    width:100%;
-    cursor:pointer;
-    transition:.3s;
-}
+.packs-screen{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:30px;}
+.pack img{width:100%;cursor:pointer;transition:.3s;}
 .pack:hover{transform:scale(1.05);}
 .pack.tearing{animation:tear .5s forwards;}
+@keyframes tear{0%{opacity:1}100%{opacity:0;transform:scale(.7);}}
 
-@keyframes tear{
-    0%{opacity:1}
-    100%{opacity:0;transform:scale(.7)}
-}
-
-.cards-screen{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
-    gap:20px;
-}
-
-.card{
-    height:250px;
-    cursor:pointer;
-    perspective:1000px;
-}
-.card-inner{
-    width:100%;
-    height:100%;
-    transition:.6s;
-    transform-style:preserve-3d;
-}
+.cards-screen{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:20px;}
+.card{height:250px;cursor:pointer;perspective:1000px;}
+.card-inner{width:100%;height:100%;transition:.6s;transform-style:preserve-3d;}
 .card.flipped .card-inner{transform:rotateY(180deg);}
-.card-face{
-    position:absolute;
-    width:100%;
-    height:100%;
-    backface-visibility:hidden;
-    border-radius:10px;
-}
+.card-face{position:absolute;width:100%;height:100%;backface-visibility:hidden;border-radius:10px;}
 .card-front{transform:rotateY(180deg);}
 .card-face img{width:100%;height:100%;object-fit:cover;}
 
-.back-button{
-    position:fixed;
-    top:20px;
-    left:20px;
-    padding:12px 25px;
-    font-size:16px;
-    border:none;
-    border-radius:20px;
-    cursor:pointer;
-    background:white;
-}
+.back-button{position:fixed;top:20px;left:20px;padding:12px 25px;font-size:16px;border:none;border-radius:20px;cursor:pointer;background:white;}
 </style>
 </head>
 
@@ -102,18 +42,18 @@ body{
     <!-- BOX -->
     <div class="box-screen" id="boxScreen">
         <div class="box">
-            <img src="box.png">
+            <img src="box.png" alt="Box">
         </div>
     </div>
 
     <!-- PACKS -->
     <div class="packs-screen hidden" id="packsScreen">
-        <div class="pack"><img src="pack.png"></div>
-        <div class="pack"><img src="pack.png"></div>
-        <div class="pack"><img src="pack.png"></div>
-        <div class="pack"><img src="pack.png"></div>
-        <div class="pack"><img src="pack.png"></div>
-        <div class="pack"><img src="pack.png"></div>
+        <div class="pack"><img src="pack.png" alt="Pack"></div>
+        <div class="pack"><img src="pack.png" alt="Pack"></div>
+        <div class="pack"><img src="pack.png" alt="Pack"></div>
+        <div class="pack"><img src="pack.png" alt="Pack"></div>
+        <div class="pack"><img src="pack.png" alt="Pack"></div>
+        <div class="pack"><img src="pack.png" alt="Pack"></div>
     </div>
 
     <!-- CARDS -->
@@ -122,6 +62,7 @@ body{
 </div>
 
 <script>
+// ------------------ STATE ------------------
 const boxScreen = document.getElementById("boxScreen");
 const packsScreen = document.getElementById("packsScreen");
 const cardsScreen = document.getElementById("cardsScreen");
@@ -130,34 +71,47 @@ const backBtn = document.getElementById("backBtn");
 let screen = "box";
 let cardImages = [];
 
-/* 🔥 LOAD WHITE FLARE STYLE CARDS (Scarlet & Violet – Fire themed) */
+// ------------------ AUDIO ------------------
+const bgMusic = new Audio("bgsong.mp3");
+const packTearSound = new Audio("packtear.mp3");
+const paperSound = new Audio("paper.mp3");
+
+// Start music on first click
+document.body.addEventListener("click", ()=>{
+    bgMusic.loop = true;
+    bgMusic.play().catch(e=>console.log("Music failed:", e));
+}, { once:true });
+
+// ------------------ LOAD CARDS ------------------
 async function loadCards(){
-    const res = await fetch(
-        "https://api.pokemontcg.io/v2/cards?q=set.id:sv03 types:Fire&pageSize=250"
-    );
-    const data = await res.json();
-
-    cardImages = data.data
-        .filter(c => c.images && c.images.large)
-        .map(c => c.images.large);
-
-    console.log("Loaded cards:", cardImages.length);
+    try{
+        const res = await fetch("https://api.pokemontcg.io/v2/cards?q=set.id:sv03 types:Fire&pageSize=250");
+        const data = await res.json();
+        cardImages = data.data.filter(c=>c.images && c.images.large).map(c=>c.images.large);
+        console.log("Loaded cards:", cardImages.length);
+    }catch(e){
+        console.error("Failed to fetch cards:", e);
+    }
 }
-
 loadCards();
 
-/* BOX CLICK */
-document.querySelector(".box").onclick = () => {
+// ------------------ BOX CLICK ------------------
+document.querySelector(".box").onclick = ()=>{
     boxScreen.classList.add("hidden");
     packsScreen.classList.remove("hidden");
     backBtn.classList.remove("hidden");
     screen = "packs";
 };
 
-/* PACK CLICK */
+// ------------------ PACK CLICK ------------------
 document.querySelectorAll(".pack").forEach(pack=>{
-    pack.onclick = () => {
+    pack.onclick = ()=>{
         if(pack.classList.contains("tearing")) return;
+
+        // play pack tear sound
+        packTearSound.currentTime = 0;
+        packTearSound.play().catch(e=>console.log("Pack sound failed", e));
+
         pack.classList.add("tearing");
 
         setTimeout(()=>{
@@ -169,7 +123,7 @@ document.querySelectorAll(".pack").forEach(pack=>{
     };
 });
 
-/* OPEN PACK (11 UNIQUE CARDS) */
+// ------------------ OPEN PACK ------------------
 function openPack(){
     cardsScreen.innerHTML = "";
     let available = [...cardImages];
@@ -182,16 +136,15 @@ function openPack(){
         div.className = "card";
         div.innerHTML = `
         <div class="card-inner">
-            <div class="card-face card-back">
-                <img src="back.png">
-            </div>
-            <div class="card-face card-front">
-                <img src="${card}">
-            </div>
+            <div class="card-face card-back"><img src="back.png"></div>
+            <div class="card-face card-front"><img src="${card}"></div>
         </div>`;
 
-        div.onclick = () => {
+        div.onclick = ()=>{
             if(!div.classList.contains("flipped")){
+                // play card flip sound
+                paperSound.currentTime = 0;
+                paperSound.play().catch(e=>console.log("Paper sound failed", e));
                 div.classList.add("flipped");
             }
         };
@@ -200,23 +153,19 @@ function openPack(){
     }
 }
 
-/* BACK BUTTON */
-backBtn.onclick = () => {
-    if(screen === "cards"){
+// ------------------ BACK BUTTON ------------------
+backBtn.onclick = ()=>{
+    if(screen==="cards"){
         cardsScreen.classList.add("hidden");
         packsScreen.classList.remove("hidden");
-        screen = "packs";
-    }
-    else if(screen === "packs"){
+        screen="packs";
+    } else if(screen==="packs"){
         packsScreen.classList.add("hidden");
         boxScreen.classList.remove("hidden");
         backBtn.classList.add("hidden");
-        screen = "box";
+        screen="box";
     }
-
-    document.querySelectorAll(".pack").forEach(p=>{
-        p.classList.remove("tearing");
-    });
+    document.querySelectorAll(".pack").forEach(p=>p.classList.remove("tearing"));
 };
 </script>
 
