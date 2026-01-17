@@ -1,198 +1,198 @@
-!DOCTYPE html
-html lang=en
-head
-meta charset=UTF-8
-meta name=viewport content=width=device-width, initial-scale=1.0
-titlePokémon Pack Opening Simulatortitle
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pokémon Pack Opening Simulator</title>
 
-style
-{margin0;padding0;box-sizingborder-box;}
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
 body{
-    font-familyArial,sans-serif;
-    backgroundurl(background.jpg) centercover fixed;
-    min-height100vh;
-    displayflex;
-    justify-contentcenter;
-    align-itemscenter;
+    font-family:Arial,sans-serif;
+    background:url("background.jpg") center/cover fixed;
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
 }
-.container{max-width1200px;width100%;padding20px;}
-.hidden{displaynone!important;}
+.container{max-width:1200px;width:100%;padding:20px;}
+.hidden{display:none!important;}
 
 .box-screen,.packs-screen,.cards-screen{
-    min-height80vh;
-    displayflex;
-    justify-contentcenter;
-    align-itemscenter;
+    min-height:80vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
 }
 
 .box img{
-    max-width400px;
-    cursorpointer;
-    transition.3s;
+    max-width:400px;
+    cursor:pointer;
+    transition:.3s;
 }
-.box imghover{transformscale(1.05);}
+.box img:hover{transform:scale(1.05);}
 
 .packs-screen{
-    displaygrid;
-    grid-template-columnsrepeat(auto-fit,minmax(200px,1fr));
-    gap30px;
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+    gap:30px;
 }
 
 .pack img{
-    width100%;
-    cursorpointer;
-    transition.3s;
+    width:100%;
+    cursor:pointer;
+    transition:.3s;
 }
-.packhover{transformscale(1.05);}
-.pack.tearing{animationtear .5s forwards;}
+.pack:hover{transform:scale(1.05);}
+.pack.tearing{animation:tear .5s forwards;}
 
 @keyframes tear{
-    0%{opacity1}
-    100%{opacity0;transformscale(.7)}
+    0%{opacity:1}
+    100%{opacity:0;transform:scale(.7)}
 }
 
 .cards-screen{
-    displaygrid;
-    grid-template-columnsrepeat(auto-fit,minmax(150px,1fr));
-    gap20px;
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+    gap:20px;
 }
 
 .card{
-    height250px;
-    cursorpointer;
-    perspective1000px;
+    height:250px;
+    cursor:pointer;
+    perspective:1000px;
 }
 .card-inner{
-    width100%;
-    height100%;
-    transition.6s;
-    transform-stylepreserve-3d;
+    width:100%;
+    height:100%;
+    transition:.6s;
+    transform-style:preserve-3d;
 }
-.card.flipped .card-inner{transformrotateY(180deg);}
+.card.flipped .card-inner{transform:rotateY(180deg);}
 .card-face{
-    positionabsolute;
-    width100%;
-    height100%;
-    backface-visibilityhidden;
-    border-radius10px;
+    position:absolute;
+    width:100%;
+    height:100%;
+    backface-visibility:hidden;
+    border-radius:10px;
 }
-.card-front{transformrotateY(180deg);}
-.card-face img{width100%;height100%;object-fitcover;}
+.card-front{transform:rotateY(180deg);}
+.card-face img{width:100%;height:100%;object-fit:cover;}
 
 .back-button{
-    positionfixed;
-    top20px;
-    left20px;
-    padding12px 25px;
-    font-size16px;
-    bordernone;
-    border-radius20px;
-    cursorpointer;
-    backgroundwhite;
+    position:fixed;
+    top:20px;
+    left:20px;
+    padding:12px 25px;
+    font-size:16px;
+    border:none;
+    border-radius:20px;
+    cursor:pointer;
+    background:white;
 }
-style
-head
+</style>
+</head>
 
-body
+<body>
 
-button class=back-button hidden id=backBtn← Backbutton
+<button class="back-button hidden" id="backBtn">← Back</button>
 
-div class=container
+<div class="container">
 
-    !-- BOX --
-    div class=box-screen id=boxScreen
-        div class=box
-            img src=box.png
-        div
-    div
+    <!-- BOX -->
+    <div class="box-screen" id="boxScreen">
+        <div class="box">
+            <img src="box.png">
+        </div>
+    </div>
 
-    !-- PACKS --
-    div class=packs-screen hidden id=packsScreen
-        div class=packimg src=pack.pngdiv
-        div class=packimg src=pack.pngdiv
-        div class=packimg src=pack.pngdiv
-        div class=packimg src=pack.pngdiv
-        div class=packimg src=pack.pngdiv
-        div class=packimg src=pack.pngdiv
-    div
+    <!-- PACKS -->
+    <div class="packs-screen hidden" id="packsScreen">
+        <div class="pack"><img src="pack.png"></div>
+        <div class="pack"><img src="pack.png"></div>
+        <div class="pack"><img src="pack.png"></div>
+        <div class="pack"><img src="pack.png"></div>
+        <div class="pack"><img src="pack.png"></div>
+        <div class="pack"><img src="pack.png"></div>
+    </div>
 
-    !-- CARDS --
-    div class=cards-screen hidden id=cardsScreendiv
+    <!-- CARDS -->
+    <div class="cards-screen hidden" id="cardsScreen"></div>
 
-div
+</div>
 
-script
-const boxScreen = document.getElementById(boxScreen);
-const packsScreen = document.getElementById(packsScreen);
-const cardsScreen = document.getElementById(cardsScreen);
-const backBtn = document.getElementById(backBtn);
+<script>
+const boxScreen = document.getElementById("boxScreen");
+const packsScreen = document.getElementById("packsScreen");
+const cardsScreen = document.getElementById("cardsScreen");
+const backBtn = document.getElementById("backBtn");
 
-let screen = box;
+let screen = "box";
 let cardImages = [];
 
- 🔥 LOAD WHITE FLARE STYLE CARDS (Scarlet & Violet – Fire themed) 
+/* 🔥 LOAD WHITE FLARE STYLE CARDS (Scarlet & Violet – Fire themed) */
 async function loadCards(){
     const res = await fetch(
-        httpsapi.pokemontcg.iov2cardsq=set.idsv03 typesFire&pageSize=250
+        "https://api.pokemontcg.io/v2/cards?q=set.id:sv03 types:Fire&pageSize=250"
     );
     const data = await res.json();
 
     cardImages = data.data
-        .filter(c = c.images && c.images.large)
-        .map(c = c.images.large);
+        .filter(c => c.images && c.images.large)
+        .map(c => c.images.large);
 
-    console.log(Loaded cards, cardImages.length);
+    console.log("Loaded cards:", cardImages.length);
 }
 
 loadCards();
 
- BOX CLICK 
-document.querySelector(.box).onclick = () = {
-    boxScreen.classList.add(hidden);
-    packsScreen.classList.remove(hidden);
-    backBtn.classList.remove(hidden);
-    screen = packs;
+/* BOX CLICK */
+document.querySelector(".box").onclick = () => {
+    boxScreen.classList.add("hidden");
+    packsScreen.classList.remove("hidden");
+    backBtn.classList.remove("hidden");
+    screen = "packs";
 };
 
- PACK CLICK 
-document.querySelectorAll(.pack).forEach(pack={
-    pack.onclick = () = {
-        if(pack.classList.contains(tearing)) return;
-        pack.classList.add(tearing);
+/* PACK CLICK */
+document.querySelectorAll(".pack").forEach(pack=>{
+    pack.onclick = () => {
+        if(pack.classList.contains("tearing")) return;
+        pack.classList.add("tearing");
 
-        setTimeout(()={
-            packsScreen.classList.add(hidden);
-            cardsScreen.classList.remove(hidden);
+        setTimeout(()=>{
+            packsScreen.classList.add("hidden");
+            cardsScreen.classList.remove("hidden");
             openPack();
-            screen = cards;
+            screen = "cards";
         },500);
     };
 });
 
- OPEN PACK (11 UNIQUE CARDS) 
+/* OPEN PACK (11 UNIQUE CARDS) */
 function openPack(){
-    cardsScreen.innerHTML = ;
+    cardsScreen.innerHTML = "";
     let available = [...cardImages];
 
-    for(let i=0;i11;i++){
-        const index = Math.floor(Math.random()available.length);
+    for(let i=0;i<11;i++){
+        const index = Math.floor(Math.random()*available.length);
         const card = available.splice(index,1)[0];
 
-        const div = document.createElement(div);
-        div.className = card;
+        const div = document.createElement("div");
+        div.className = "card";
         div.innerHTML = `
-        div class=card-inner
-            div class=card-face card-back
-                img src=back.png
-            div
-            div class=card-face card-front
-                img src=${card}
-            div
-        div`;
+        <div class="card-inner">
+            <div class="card-face card-back">
+                <img src="back.png">
+            </div>
+            <div class="card-face card-front">
+                <img src="${card}">
+            </div>
+        </div>`;
 
-        div.onclick = () = {
-            if(!div.classList.contains(flipped)){
-                div.classList.add(flipped);
+        div.onclick = () => {
+            if(!div.classList.contains("flipped")){
+                div.classList.add("flipped");
             }
         };
 
@@ -200,25 +200,25 @@ function openPack(){
     }
 }
 
- BACK BUTTON 
-backBtn.onclick = () = {
-    if(screen === cards){
-        cardsScreen.classList.add(hidden);
-        packsScreen.classList.remove(hidden);
-        screen = packs;
+/* BACK BUTTON */
+backBtn.onclick = () => {
+    if(screen === "cards"){
+        cardsScreen.classList.add("hidden");
+        packsScreen.classList.remove("hidden");
+        screen = "packs";
     }
-    else if(screen === packs){
-        packsScreen.classList.add(hidden);
-        boxScreen.classList.remove(hidden);
-        backBtn.classList.add(hidden);
-        screen = box;
+    else if(screen === "packs"){
+        packsScreen.classList.add("hidden");
+        boxScreen.classList.remove("hidden");
+        backBtn.classList.add("hidden");
+        screen = "box";
     }
 
-    document.querySelectorAll(.pack).forEach(p={
-        p.classList.remove(tearing);
+    document.querySelectorAll(".pack").forEach(p=>{
+        p.classList.remove("tearing");
     });
 };
-script
+</script>
 
-body
-html
+</body>
+</html>
