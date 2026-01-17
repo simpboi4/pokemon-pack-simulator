@@ -8,24 +8,24 @@
 * { margin:0; padding:0; box-sizing:border-box; }
 body { font-family: Arial, sans-serif; background: url("background.jpg") center/cover fixed; min-height: 100vh; display:flex; justify-content:center; align-items:center; overflow-x:hidden; }
 
-.container { max-width: 1200px; width: 100%; padding: 20px; }
-.hidden { display: none !important; }
+.container { max-width: 1200px; width:100%; padding:20px; }
+.hidden { display:none!important; }
 
-.box-screen, .packs-screen, .cards-screen { min-height:80vh; display:flex; justify-content:center; align-items:center; }
+.box-screen, .packs-screen, .cards-screen { min-height:80vh; display:flex; justify-content:center; align-items:center; flex-wrap: wrap; }
 
-.box img { max-width:400px; cursor:pointer; transition: .3s; }
-.box img:hover { transform: scale(1.05); }
+.box img { max-width:400px; cursor:pointer; transition:.3s; }
+.box img:hover { transform:scale(1.05); }
 
 .packs-screen { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:20px; }
-.pack img { width:100%; cursor:pointer; transition: .3s; }
-.pack:hover { transform: scale(1.05); }
+.pack img { width:100%; cursor:pointer; transition:.3s; }
+.pack:hover { transform:scale(1.05); }
 .pack.tearing { animation: tear .5s forwards; }
-@keyframes tear { 0%{opacity:1}50%{transform:scale(1.1)}100%{opacity:0;transform:scale(.7);} }
+@keyframes tear { 0%{opacity:1} 50%{transform:scale(1.1)} 100%{opacity:0;transform:scale(.7);} }
 
 .cards-screen { display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:15px; }
 .card { height:200px; cursor:pointer; perspective:1000px; }
 .card-inner { width:100%; height:100%; transition:.6s; transform-style: preserve-3d; }
-.card.flipped .card-inner { transform: rotateY(180deg); }
+.card.flipped .card-inner { transform:rotateY(180deg); }
 .card-face { position:absolute; width:100%; height:100%; backface-visibility:hidden; border-radius:10px; box-shadow:0 5px 15px rgba(0,0,0,0.3); }
 .card-front { transform:rotateY(180deg); }
 .card-face img { width:100%; height:100%; object-fit:cover; }
@@ -33,13 +33,13 @@ body { font-family: Arial, sans-serif; background: url("background.jpg") center/
 .back-button { position:fixed; top:20px; left:20px; padding:12px 25px; font-size:16px; border:none; border-radius:20px; cursor:pointer; background:white; z-index:1000; }
 .back-button:hover { transform: scale(1.05); }
 
-@media(max-width:768px) {
+@media(max-width:768px){
     .packs-screen { grid-template-columns:repeat(2,1fr); gap:15px; }
     .cards-screen { grid-template-columns:repeat(2,1fr); gap:10px; }
     .card { height:150px; }
     .back-button { padding:10px 20px; font-size:14px; }
 }
-@media(max-width:480px) {
+@media(max-width:480px){
     .packs-screen, .cards-screen { grid-template-columns:1fr; }
     .card { height:120px; }
 }
@@ -84,11 +84,9 @@ let cardImages = [];
 const bgMusic = new Audio("bgsong.mp3"); bgMusic.loop = true;
 const packTearSound = new Audio("packtear.mp3");
 const paperSound = new Audio("paper.mp3");
+document.body.addEventListener("click", ()=>{ bgMusic.play().catch(e=>console.log("Music failed:",e)); }, {once:true});
 
-// Play music on first click (iOS/Android)
-document.body.addEventListener("click", ()=>{ bgMusic.play().catch(e=>console.log("Music failed:",e)); }, { once:true });
-
-// ---------------- LOAD CARDS ----------------
+// ---------------- LOAD CARDS FROM API ----------------
 async function loadCards(){
     try{
         const res = await fetch("https://api.pokemontcg.io/v2/cards?q=set.id:sv03 types:Fire&pageSize=250", {
@@ -97,7 +95,7 @@ async function loadCards(){
         const data = await res.json();
         cardImages = data.data.filter(c=>c.images && c.images.large).map(c=>c.images.large);
         console.log("Loaded cards:", cardImages.length);
-    }catch(e){ console.error("Failed to fetch cards:", e); }
+    }catch(e){ console.error("Failed to fetch cards:", e);}
 }
 loadCards();
 
@@ -106,7 +104,7 @@ document.querySelector(".box").onclick = ()=>{
     boxScreen.classList.add("hidden");
     packsScreen.classList.remove("hidden");
     backBtn.classList.remove("hidden");
-    screen = "packs";
+    screen="packs";
 };
 
 // ---------------- PACK CLICK ----------------
@@ -114,40 +112,45 @@ document.querySelectorAll(".pack").forEach(pack=>{
     pack.onclick = ()=>{
         if(pack.classList.contains("tearing")) return;
         packTearSound.currentTime=0;
-        packTearSound.play().catch(e=>console.log("Pack sound failed", e));
+        packTearSound.play().catch(e=>console.log("Pack sound failed",e));
         pack.classList.add("tearing");
 
         setTimeout(()=>{
             packsScreen.classList.add("hidden");
             cardsScreen.classList.remove("hidden");
-            openPack();
+            showBacks();
             screen="cards";
         },500);
     };
 });
 
-// ---------------- OPEN PACK ----------------
-function openPack(){
+// ---------------- SHOW 11 BACKS ----------------
+function showBacks(){
     cardsScreen.innerHTML="";
+    // Clone cardImages to keep unique selection later
     let available = [...cardImages];
     for(let i=0;i<11;i++){
-        if(available.length===0) break;
-        const index=Math.floor(Math.random()*available.length);
-        const card = available.splice(index,1)[0];
-
         const div = document.createElement("div");
-        div.className = "card";
-        div.innerHTML = `
+        div.className="card";
+        div.dataset.flipped="false";
+        div.dataset.index=i; // optional
+        div.innerHTML=`
             <div class="card-inner">
                 <div class="card-face card-back"><img src="back.png" alt="Card Back"></div>
-                <div class="card-face card-front"><img src="${card}" alt="Pokémon Card"></div>
+                <div class="card-face card-front"><img src="" alt="Pokémon Card"></div>
             </div>
         `;
         div.onclick = ()=>{
-            if(!div.classList.contains("flipped")){
+            if(div.dataset.flipped==="false" && available.length>0){
+                // Pick a random unique card
+                const index = Math.floor(Math.random()*available.length);
+                const cardUrl = available.splice(index,1)[0];
+                const frontImg = div.querySelector(".card-front img");
+                frontImg.src = cardUrl;
                 paperSound.currentTime=0;
-                paperSound.play().catch(e=>console.log("Paper sound failed", e));
+                paperSound.play().catch(e=>console.log("Paper sound failed",e));
                 div.classList.add("flipped");
+                div.dataset.flipped="true";
             }
         };
         cardsScreen.appendChild(div);
